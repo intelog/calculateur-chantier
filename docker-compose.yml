@@ -1,0 +1,11 @@
+services:
+  calculateur:
+    build: .
+    image: calculateur-chantier:latest
+    container_name: calculateur-chantier
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "8000"
