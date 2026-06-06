@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Calculateur chantier</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Renovation</p>
+          <h1>Calculateur chantier</h1>
+        </div>
+        <div class="summary-chip">Structure | Gypse | Plancher | Peinture | Moulures</div>
+      </header>
+
+      <div class="tabs" role="tablist" aria-label="Calculateurs">
+        <button class="tab-button active" type="button" role="tab" aria-selected="true" aria-controls="structure-panel" data-tab="structure-panel">Structure</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="panel-panel" data-tab="panel-panel">Gypse / panneaux</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="floor-panel" data-tab="floor-panel">Plancher</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="paint-panel" data-tab="paint-panel">Peinture</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="trim-panel" data-tab="trim-panel">Moulures</button>
+      </div>
+
+      <section class="calculator-grid tab-panel active" id="structure-panel" role="tabpanel">
+        <form class="tool-panel" id="stud-form">
+          <div class="panel-heading">
+            <h2>Structure</h2>
+            <span>2x3, 2x4, 2x6</span>
+          </div>
+
+          <div class="field-grid">
+            <label class="field"><span>Type de piece</span><div class="input-row single"><select name="structureType" aria-label="Type de piece"><option value="2 x 3">2 x 3</option><option value="2 x 4" selected>2 x 4</option><option value="2 x 6">2 x 6</option><option value="2 x 8">2 x 8</option><option value="Autre">Autre</option></select></div></label>
+            <label class="field"><span>Longueur de la section</span><div class="input-row"><input name="wallLength" inputmode="decimal" value="12"><select name="wallLengthUnit" aria-label="Unite longueur"><option value="ft">pi</option><option value="in">po</option><option value="m">m</option><option value="cm">cm</option></select></div></label>
+            <label class="field"><span>Hauteur / coupe</span><div class="input-row"><input name="wallHeight" inputmode="decimal" value="8"><select name="wallHeightUnit" aria-label="Unite hauteur"><option value="ft">pi</option><option value="in">po</option><option value="m">m</option><option value="cm">cm</option></select></div></label>
+            <label class="field"><span>Espacement C/C</span><div class="input-row"><input name="spacing" inputmode="decimal" value="16"><select name="spacingUnit" aria-label="Unite espacement"><option value="in">po</option><option value="ft">pi</option><option value="cm">cm</option><option value="m">m</option></select></div></label>
+            <label class="field"><span>Longueur achetee</span><div class="input-row"><input name="stockLength" inputmode="decimal" value="8"><select name="stockLengthUnit" aria-label="Unite longueur achetee"><option value="ft">pi</option><option value="in">po</option><option value="m">m</option><option value="cm">cm</option></select></div></label>
+            <label class="field"><span>Prix par piece</span><div class="input-row"><input name="studPrice" inputmode="decimal" value="4.75"><span class="unit-pill">$</span></div></label>
+            <label class="field"><span>Pieces en extra</span><div class="input-row"><input name="extraStuds" inputmode="numeric" value="2"><span class="unit-pill">pcs</span></div></label>
+            <label class="field"><span>Perte</span><div class="input-row"><input name="studWaste" inputmode="decimal" value="10"><span class="unit-pill">%</span></div></label>
+          </div>
+
+          <div class="actions"><button class="primary-button" type="submit">Calculer</button><button class="ghost-button" type="button" data-reset="stud-form">Reinitialiser</button></div>
+        </form>
+
+        <aside class="result-panel" aria-live="polite">
+          <div class="result-hero"><span>Pieces requises</span><strong id="stud-total">-</strong></div>
+          <div class="metric-grid">
+            <div class="metric"><span>Pieces a acheter</span><strong id="stud-stock-pieces">-</strong></div>
+            <div class="metric"><span>Cout estime</span><strong id="stud-cost">-</strong></div>
+            <div class="metric"><span>Coupe par piece</span><strong id="stud-cut-length">-</strong></div>
+            <div class="metric"><span>Pieces par longueur</span><strong id="studs-per-piece">-</strong></div>
+          </div>
+          <dl class="details">
+            <div><dt>Pieces de base</dt><dd id="stud-base">-</dd></div><div><dt>Avec extras</dt><dd id="stud-before-waste">-</dd></div><div><dt>Longueur utilisee</dt><dd id="stud-used-linear">-</dd></div><div><dt>Longueur achetee</dt><dd id="stud-purchased-linear">-</dd></div><div><dt>Perte lineaire</dt><dd id="stud-waste-linear">-</dd></div><div><dt>Espacement moyen reel</dt><dd id="stud-average-spacing">-</dd></div>
+          </dl>
+          <div class="warning-list" id="stud-warnings" hidden></div>
+        </aside>
+      </section>
+
+      <section class="calculator-grid tab-panel" id="panel-panel" role="tabpanel" hidden>
+        <form class="tool-panel" id="panel-form">
+          <div class="panel-heading"><h2>Feuilles</h2><span>Gypse ou panneau</span></div>
+          <div class="preset-row" aria-label="Dimensions populaires"><button class="preset-button active" type="button" data-panel-width="4" data-panel-height="8">4 x 8</button><button class="preset-button" type="button" data-panel-width="4" data-panel-height="10">4 x 10</button><button class="preset-button" type="button" data-panel-width="4" data-panel-height="12">4 x 12</button></div>
+          <div class="field-grid">
+            <label class="field"><span>Longueur a couvrir</span><div class="input-row"><input name="surfaceLength" inputmode="decimal" value="12"><select name="surfaceLengthUnit" aria-label="Unite longueur a couvrir"><option value="ft">pi</option><option value="in">po</option><option value="m">m</option><option value="cm">cm</option></select></div></label>
+            <label class="field"><span>Hauteur a couvrir</span><div class="input-row"><input name="surfaceHeight" inputmode="decimal" value="8"><select name="surfaceHeightUnit" aria-label="Unite hauteur a couvrir"><option value="ft">pi</option><option value="in">po</option><option value="m">m</option><option value="cm">cm</option></select></div></label>
+            <label class="field"><span>Largeur du panneau</span><div class="input-row"><input name="panelWidth" inputmode="decimal" value="4"><select name="panelWidthUnit" aria-label="Unite largeur du panneau"><option value="ft">pi</option><option value="in">po</option><option value="m">m</option><option value="cm">cm</option></select></div></label>
+            <label class="field"><span>Hauteur du panneau</span><div class="input-row"><input name="panelHeight" inputmode="decimal" value="8"><select name="panelHeightUnit" aria-label="Unite hauteur du panneau"><option value="ft">pi</option><option value="in">po</option><option value="m">m</option><option value="cm">cm</option></select></div></label>
+            <label class="field"><span>Surface a retirer</span><div class="input-row"><input name="openingsArea" inputmode="decimal" value="0"><select name="openingsAreaUnit" aria-label="Unite surface a retirer"><option value="ft2">pi2</option><option value="in2">po2</option><option value="m2">m2</option><option value="cm2">cm2</option></select></div></label>
+            <label class="field"><span>Prix par feuille</span><div class="input-row"><input name="panelPrice" inputmode="decimal" value="17.50"><span class="unit-pill">$</span></div></label>
+            <label class="field"><span>Perte</span><div class="input-row"><input name="panelWaste" inputmode="decimal" value="10"><span class="unit-pill">%</span></div></label>
+          </div>
+          <div class="actions"><button class="primary-button" type="submit">Calculer</button><button class="ghost-button" type="button" data-reset="panel-form">Reinitialiser</button></div>
+        </form>
+        <aside class="result-panel" aria-live="polite">
+          <div class="result-hero blue"><span>Feuilles requises</span><strong id="panel-total">-</strong></div>
+          <div class="metric-grid"><div class="metric"><span>Cout estime</span><strong id="panel-cost">-</strong></div><div class="metric"><span>Surface nette</span><strong id="panel-net-area">-</strong></div><div class="metric"><span>Surface par feuille</span><strong id="panel-area">-</strong></div><div class="metric"><span>Feuilles exactes</span><strong id="panel-raw">-</strong></div></div>
+          <dl class="details"><div><dt>Surface brute</dt><dd id="panel-gross-area">-</dd></div><div><dt>Surface achetee</dt><dd id="panel-purchased-area">-</dd></div><div><dt>Surplus estime</dt><dd id="panel-surplus-area">-</dd></div></dl>
+        </aside>
+      </section>
+
+      <section class="calculator-grid tab-panel" id="floor-panel" role="tabpanel" hidden>
+        <form class="tool-panel" id="floor-form">
+          <div class="panel-heading"><h2>Plancher</h2><span>Boites et surface</span></div>
+          <div class="field-grid">
+            <label class="field"><span>Longueur du plancher</span><div class="input-row"><input name="floorLength" inputmode="decimal" value="12"><select name="floorLengthUnit" aria-label="Unite longueur du plancher"><option value="ft">pi</option><option value="in">po</option><option value="m">m</option><option value="cm">cm</option></select></div></label>
+            <label class="field"><span>Largeur du plancher</span><div class="input-row"><input name="floorWidth" inputmode="decimal" value="10"><select name="floorWidthUnit" aria-label="Unite largeur du plancher"><option value="ft">pi</option><option value="in">po</option><option value="m">m</option><option value="cm">cm</option></select></div></label>
+            <label class="field"><span>Surface a retirer</span><div class="input-row"><input name="floorOpeningsArea" inputmode="decimal" value="0"><select name="floorOpeningsAreaUnit" aria-label="Unite surface a retirer"><option value="ft2">pi2</option><option value="in2">po2</option><option value="m2">m2</option><option value="cm2">cm2</option></select></div></label>
+            <label class="field"><span>Couverture par boite</span><div class="input-row"><input name="floorCoverage" inputmode="decimal" value="20"><select name="floorCoverageUnit" aria-label="Unite couverture par boite"><option value="ft2">pi2</option><option value="m2">m2</option><option value="in2">po2</option><option value="cm2">cm2</option></select></div></label>
+            <label class="field"><span>Prix par boite</span><div class="input-row"><input name="floorPrice" inputmode="decimal" value="48.99"><span class="unit-pill">$</span></div></label>
+            <label class="field"><span>Perte</span><div class="input-row"><input name="floorWaste" inputmode="decimal" value="10"><span class="unit-pill">%</span></div></label>
+          </div>
+          <div class="actions"><button class="primary-button" type="submit">Calculer</button><button class="ghost-button" type="button" data-reset="floor-form">Reinitialiser</button></div>
+        </form>
+        <aside class="result-panel" aria-live="polite"><div class="result-hero amber"><span>Boites requises</span><strong id="floor-total">-</strong></div><div class="metric-grid"><div class="metric"><span>Cout estime</span><strong id="floor-cost">-</strong></div><div class="metric"><span>Surface nette</span><strong id="floor-net-area">-</strong></div><div class="metric"><span>Couverture boite</span><strong id="floor-coverage">-</strong></div><div class="metric"><span>Boites exactes</span><strong id="floor-raw">-</strong></div></div><dl class="details"><div><dt>Surface brute</dt><dd id="floor-gross-area">-</dd></div><div><dt>Surface achetee</dt><dd id="floor-purchased-area">-</dd></div><div><dt>Surplus estime</dt><dd id="floor-surplus-area">-</dd></div></dl></aside>
+      </section>
+
+      <section class="calculator-grid tab-panel" id="paint-panel" role="tabpanel" hidden>
+        <form class="tool-panel" id="paint-form">
+          <div class="panel-heading"><h2>Peinture</h2><span>Murs et plafond</span></div>
+          <div class="field-grid">
+            <label class="field"><span>Longueur de la piece</span><div class="input-row"><input name="paintLength" inputmode="decimal" value="12"><select name="paintLengthUnit" aria-label="Unite longueur de la piece"><option value="ft">pi</option><option value="in">po</option><option value="m">m</option><option value="cm">cm</option></select></div></label>
+            <label class="field"><span>Largeur de la piece</span><div class="input-row"><input name="paintWidth" inputmode="decimal" value="10"><select name="paintWidthUnit" aria-label="Unite largeur de la piece"><option value="ft">pi</option><option value="in">po</option><option value="m">m</option><option value="cm">cm</option></select></div></label>
+            <label class="field"><span>Hauteur des murs</span><div class="input-row"><input name="paintHeight" inputmode="decimal" value="8"><select name="paintHeightUnit" aria-label="Unite hauteur des murs"><option value="ft">pi</option><option value="in">po</option><option value="m">m</option><option value="cm">cm</option></select></div></label>
+            <label class="field"><span>Surface portes/fenetres</span><div class="input-row"><input name="paintOpeningsArea" inputmode="decimal" value="40"><select name="paintOpeningsAreaUnit" aria-label="Unite surface portes fenetres"><option value="ft2">pi2</option><option value="in2">po2</option><option value="m2">m2</option><option value="cm2">cm2</option></select></div></label>
+            <label class="field"><span>Couverture par contenant</span><div class="input-row"><input name="paintCoverage" inputmode="decimal" value="400"><select name="paintCoverageUnit" aria-label="Unite couverture peinture"><option value="ft2">pi2</option><option value="m2">m2</option><option value="in2">po2</option><option value="cm2">cm2</option></select></div></label>
+            <label class="field"><span>Nombre de couches</span><div class="input-row"><input name="paintCoats" inputmode="numeric" value="2"><span class="unit-pill">x</span></div></label>
+            <label class="field"><span>Prix par contenant</span><div class="input-row"><input name="paintPrice" inputmode="decimal" value="54.99"><span class="unit-pill">$</span></div></label>
+            <label class="checkbox-field"><input type="checkbox" name="includeCeiling" checked><span>Inclure le plafond</span></label>
+          </div>
+          <div class="actions"><button class="primary-button" type="submit">Calculer</button><button class="ghost-button" type="button" data-reset="paint-form">Reinitialiser</button></div>
+        </form>
+        <aside class="result-panel" aria-live="polite"><div class="result-hero steel"><span>Contenants requis</span><strong id="paint-total">-</strong></div><div class="metric-grid"><div class="metric"><span>Cout estime</span><strong id="paint-cost">-</strong></div><div class="metric"><span>Surface nette</span><strong id="paint-net-area">-</strong></div><div class="metric"><span>Couches</span><strong id="paint-coats">-</strong></div><div class="metric"><span>Couverture</span><strong id="paint-coverage">-</strong></div></div><dl class="details"><div><dt>Surface des murs</dt><dd id="paint-wall-area">-</dd></div><div><dt>Surface plafond</dt><dd id="paint-ceiling-area">-</dd></div><div><dt>Surface avec couches</dt><dd id="paint-area-with-coats">-</dd></div></dl></aside>
+      </section>
+
+      <section class="calculator-grid tab-panel" id="trim-panel" role="tabpanel" hidden>
+        <form class="tool-panel" id="trim-form">
+          <div class="panel-heading"><h2>Moulures</h2><span>Plinthes et cadrages</span></div>
+          <div class="field-grid">
+            <label class="field"><span>Longueur de la piece</span><div class="input-row"><input name="trimLength" inputmode="decimal" value="12"><select name="trimLengthUnit" aria-label="Unite longueur de la piece"><option value="ft">pi</option><option value="in">po</option><option value="m">m</option><option value="cm">cm</option></select></div></label>
+            <label class="field"><span>Largeur de la piece</span><div class="input-row"><input name="trimWidth" inputmode="decimal" value="10"><select name="trimWidthUnit" aria-label="Unite largeur de la piece"><option value="ft">pi</option><option value="in">po</option><option value="m">m</option><option value="cm">cm</option></select></div></label>
+            <label class="field"><span>Longueur a retirer</span><div class="input-row"><input name="trimOpeningsLength" inputmode="decimal" value="3"><select name="trimOpeningsLengthUnit" aria-label="Unite longueur a retirer"><option value="ft">pi</option><option value="in">po</option><option value="m">m</option><option value="cm">cm</option></select></div></label>
+            <label class="field"><span>Longueur d'une moulure</span><div class="input-row"><input name="trimPieceLength" inputmode="decimal" value="8"><select name="trimPieceLengthUnit" aria-label="Unite longueur moulure"><option value="ft">pi</option><option value="in">po</option><option value="m">m</option><option value="cm">cm</option></select></div></label>
+            <label class="field"><span>Prix par moulure</span><div class="input-row"><input name="trimPrice" inputmode="decimal" value="8.95"><span class="unit-pill">$</span></div></label>
+            <label class="field"><span>Perte</span><div class="input-row"><input name="trimWaste" inputmode="decimal" value="10"><span class="unit-pill">%</span></div></label>
+          </div>
+          <div class="actions"><button class="primary-button" type="submit">Calculer</button><button class="ghost-button" type="button" data-reset="trim-form">Reinitialiser</button></div>
+        </form>
+        <aside class="result-panel" aria-live="polite"><div class="result-hero clay"><span>Moulures requises</span><strong id="trim-total">-</strong></div><div class="metric-grid"><div class="metric"><span>Cout estime</span><strong id="trim-cost">-</strong></div><div class="metric"><span>Longueur nette</span><strong id="trim-net-length">-</strong></div><div class="metric"><span>Longueur piece</span><strong id="trim-piece-length">-</strong></div><div class="metric"><span>Avec perte</span><strong id="trim-needed-length">-</strong></div></div><dl class="details"><div><dt>Perimetre</dt><dd id="trim-perimeter">-</dd></div><div><dt>Longueur achetee</dt><dd id="trim-purchased-length">-</dd></div><div><dt>Surplus estime</dt><dd id="trim-surplus-length">-</dd></div></dl></aside>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
